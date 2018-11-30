@@ -1,6 +1,9 @@
-package spider
+package service
 
-import "errors"
+import (
+	"errors"
+	"lulubook/modules/spider"
+)
 
 type Spider interface{
 	SpiderUrl(url string) error
@@ -9,7 +12,7 @@ type Spider interface{
 func NewSpider(from string) (Spider, error){
 	switch from{
 	case "booktxt":
-		return new(BookTextSpider), nil
+		return new(spider.BookTextSpider), nil
 	default:
 		return nil, errors.New("系统暂未处理该类型的配置文件")
 	}

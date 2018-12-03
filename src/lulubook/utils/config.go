@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"os/exec"
 	"os"
 	"strings"
@@ -19,10 +20,10 @@ type Config struct{
 var CONFIG = new(Config)
 
 func init(){
-
 	var configFilePath string
-	path := getCurrentPath()
-	configFilePath = filepath.Join(path, "config.json")
+	//path := getCurrentPath()
+	path := os.Getenv("GOPATH")
+	configFilePath = filepath.Join(path, "src/main/config.json")
 
 	if configFilePath != "" {
 		cfgData, err := ioutil.ReadFile(configFilePath)
@@ -37,8 +38,8 @@ func init(){
 	}
 	//然后再校验
 	err := CONFIG.verify()
-	if err != "" {
-		panic("Read config file failed:" + err)
+	if err != nil {
+		panic("Read config file failed:" + err.Error())
 
 	}
 }
@@ -53,18 +54,18 @@ func getCurrentPath() string {
 	return path
 }
 
-func (cfg *Config) verify() string {
+func (cfg *Config) verify() error {
 	if cfg == nil {
-		return  "cfg nil"
+		return  errors.New("cfg nil")
 	}
 
 	if cfg.Port == 0 {
-		return "Required field 'Port' not found in config"
+		return errors.New("Required field 'Port' not found in config")
 	}
 
 	if cfg.MongodbServer == "" {
-		return "Required field 'MongodbServer' not found in config"
+		return errors.New("Required field 'MongodbServer' not found in config")
 	}
 
-	return ""
+	return nil
 }

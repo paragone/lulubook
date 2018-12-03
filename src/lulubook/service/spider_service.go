@@ -6,7 +6,7 @@ import (
 )
 
 type Spider interface{
-	SpiderUrl(url string) error
+	SpiderSite(url string) error
 }
 
 func NewSpider(from string) (Spider, error){

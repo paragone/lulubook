@@ -20,11 +20,20 @@ func GetMongoDBSession() *mgo.Session {
 	return session.Clone()
 }
 
-func WithMongoDBCollection(database,collection string, f func(*mgo.Collection) error) error {
+func WithMongoDBCollection(database, collection string, f func(*mgo.Collection) error) error {
 	session := GetMongoDBSession()
 	defer func() {
 		session.Close()
 	}()
 	c := session.DB(database).C(collection)
 	return f(c)
+}
+
+func DropMongoDB(database string) error{
+	session := GetMongoDBSession()
+	defer func() {
+		session.Close()
+	}()
+	err := session.DB(database).DropDatabase()
+	return err
 }

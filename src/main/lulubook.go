@@ -4,10 +4,14 @@ import (
 	"lulubook/modules/db"
 	"lulubook/service"
 	"lulubook/utils"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	//r := gin.Default()
+	r := gin.Default()
+
+
+
 	//for test
 	db.DropDB()
     sp ,err:= service.NewSpider("booktxt")

@@ -42,7 +42,7 @@ import (
 )
 
 
-func SendSuccessResponse(c *gin.Context, data interface{}) {
+func SendSuccessResponse(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"error_code": ErrorCodeSuccess,
 		"error_desc": ErrorDescSuccess},

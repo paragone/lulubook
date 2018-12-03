@@ -31,3 +31,14 @@ type SListCommon struct{
 	Limited   int            `form:"limited,default=0" json:"limited,default=20"`
 	Order     string         `form:"order,default=asc" json:"order,default=asc"`
 }
+
+type SpiderRequest struct{
+	Action     string               `json:"action"`
+	Name       string               `json:"name"`
+	Url        string               `json:"url"`
+}
+
+type SpiderResponse struct{
+	ErrorCode int             `json:"error_code"`
+	ErrorDesc string          `json:"error_desc"`
+}

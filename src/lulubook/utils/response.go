@@ -17,7 +17,6 @@ const (
 	ErrorCodeInvalidFormat  = 10003
 	ErrorCodeInvalidResponse = 10005
 	ErrorCodeNotSupportYet = 10006
-8
 
 )
 
@@ -36,10 +35,6 @@ const (
 
 )
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
 
 
 func SendSuccessResponse(c *gin.Context) {

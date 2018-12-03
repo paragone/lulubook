@@ -1,6 +1,6 @@
 {
   "Port" : 8001,
-  "LogPath" : "/var/log/allbook",
+  "LogPath" : "",
   "LogLevel" : 0,
   "MongodbServer" : "mongodb://127.0.0.1:27017"
 }

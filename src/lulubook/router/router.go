@@ -7,6 +7,10 @@ import (
 
 func SetupRouter(router *gin.Engine) *gin.Engine{
 	v1 := router.Group("/api/v1")
+	dbGroup := v1.Group("db")
+	{
+		dbGroup.POST("/", service.DbHandler)
+	}
 
 	spiderGroup := v1.Group("/spider")
 	{

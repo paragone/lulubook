@@ -66,15 +66,12 @@ func (spider *BookTextSpider)SpiderSite(url string) error {
 		utils.Logger.Println("getAllBookUrl error" + err.Error())
 		return err
 	}
-	channel := make(chan struct{}, 30)
-	for i,url := range spider.bookUrl {
-		channel <- struct{}{}
-		go SpiderBook(strconv.Itoa(i), url, channel)
+
+	utils.Logger.Println("got  books" + strconv.Itoa(len(spider.bookUrl)))
+
+    for i,bookurl := range spider.bookUrl {
+		SpiderBook(strconv.Itoa(i), bookurl)
 	}
-	for i := 0; i < 30; i++{
-		channel <- struct{}{}
-	}
-	close(channel)
 
 	return err
 }
@@ -119,9 +116,8 @@ func getAllBookUrl(spider *BookTextSpider, url string) error{
 	return nil
 }
 
-func SpiderBook(id string,url string, c chan struct{}) error{
+func SpiderBook(id string,url string) error{
 	utils.Logger.Println("SpiderBook url:" + url)
-	defer func(){<- c}()
 	querybook := spider_dto.SBook{}
 	querybook.Id = id
 	// Request the HTML page.
@@ -158,9 +154,15 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 		SpiderChapter( &chap)
 	}
 	*/
+	channel := make(chan struct{}, 100)
 	for i:= 0; i< len(querybook.Chapters); i++{
-		SpiderChapter(&querybook.Chapters[i])
+		channel <- struct{}{}
+		SpiderChapter(&querybook.Chapters[i], channel)
 	}
+	for i := 0; i < 100; i++{
+		channel <- struct{}{}
+	}
+	close(channel)
 	/*
     if book,err := db.ListBookByName(&querybook){
 
@@ -172,7 +174,8 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 
 type ChanTag struct{}
 
-func SpiderChapter(chapter *spider_dto.SChapter){
+func SpiderChapter(chapter *spider_dto.SChapter, c chan struct{}){
+	defer func(){<- c}()
 	utils.Logger.Println("SpiderChapter bookid:" + chapter.BookId +" chaptername：" + chapter.Title)
 	if  IsValidUrl(chapter.Url){
 		// Request the HTML page.

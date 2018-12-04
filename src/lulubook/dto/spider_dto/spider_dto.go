@@ -39,7 +39,7 @@ type SpiderRequest struct{
 	Url        string               `json:"url"`
 }
 
-type SpiderResponse struct{
-	ErrorCode int             `json:"error_code"`
-	ErrorDesc string          `json:"error_desc"`
+
+type DbRequest struct{
+	Action     string               `json:"action"`
 }

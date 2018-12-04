@@ -148,7 +148,7 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 		chapterid := i
 		title := utils.GbkToUtf8(contentSelection.Find("a").Text())
 		href, _ := contentSelection.Find("a").Attr("href")
-		url := href
+		url := "http://www.booktxt.com"+href
 		chapter := spider_dto.SChapter{Id:strconv.Itoa(chapterid), BookId:id,Title:title,Url:url, Pre:pre, Next:next}
 		querybook.Chapters = append(querybook.Chapters, chapter)
 	})
@@ -174,9 +174,9 @@ type ChanTag struct{}
 
 func SpiderChapter(chapter *spider_dto.SChapter){
 	utils.Logger.Println("SpiderChapter bookid:" + chapter.BookId +" chaptername：" + chapter.Title)
-	if  IsValidUrl("http://www.booktxt.com"+chapter.Url){
+	if  IsValidUrl(chapter.Url){
 		// Request the HTML page.
-		res, err := http.Get("http://www.booktxt.com"+chapter.Url)
+		res, err := http.Get(chapter.Url)
 		if err != nil {
 			utils.Logger.Println(err)
 		}

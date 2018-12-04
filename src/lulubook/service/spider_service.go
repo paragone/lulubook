@@ -25,14 +25,14 @@ func SpiderRun(c *gin.Context){
 	var req spider_dto.SpiderRequest
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		utils.Logger.Fatalf("req error " + err.Error())
+		utils.Logger.Println("req error " + err.Error())
 		utils.SendFailedResponse(c, utils.ErrorCodeInvalidRequest, utils.ErrorDescInvalidRequest)
 		return
 	}
 	if req.Action == "start" {
 		spider,err := NewSpider(req.Name)
 		if err != nil {
-			utils.Logger.Fatalf("start error" + err.Error())
+			utils.Logger.Println("start error" + err.Error())
 			utils.SendFailedResponse(c, utils.ErrorCodeFailed, utils.ErrorDescFaild + err.Error())
 			return
 		}

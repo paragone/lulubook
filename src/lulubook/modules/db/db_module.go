@@ -33,7 +33,7 @@ func InsertBook(book *spider_dto.SBook) error{
 
 func UpdateBook(book *spider_dto.SBook) error {
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		m := bson.M{"name":book.Name}
+		m := bson.M{"_id":book.Id}
 		err := c.Update(m, book)
 		if err != nil {
 			utils.Logger.Println("updateBook error" + err.Error())
@@ -46,7 +46,7 @@ func UpdateBook(book *spider_dto.SBook) error {
 
 func DeleteBook(book *spider_dto.SBook) error {
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		m := bson.M{"name":book.Name}
+		m := bson.M{"_id":book.Id}
 		err := c.Remove(m)
 		if err != nil {
 			utils.Logger.Println("updateBook error" + err.Error())
@@ -70,10 +70,23 @@ func ListBookByName(book *spider_dto.SBook) (*spider_dto.SBook, error) {
 	return &res, err
 }
 
+func ListBookById(req *spider_dto.SListCommon) (*spider_dto.SBook, error) {
+	var res spider_dto.SBook
+	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
+		m := bson.M{"_id":req.Id}
+		err := c.Find(m).One(&res)
+		if err != nil {
+			utils.Logger.Println("ListBookByName error" + err.Error())
+		}
+		return err
+	})
+	return &res, err
+}
+
 func ListAllBook(req *spider_dto.SListCommon) (*[]spider_dto.SBook,error) {
 	var res []spider_dto.SBook
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		err := c.Find(bson.M{}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
+		err := c.Find(bson.M{}).Select(bson.M{"chapter": 0}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
 		if err != nil{
 			utils.Logger.Println("ListBook error" + err.Error())
 		}
@@ -84,7 +97,7 @@ func ListAllBook(req *spider_dto.SListCommon) (*[]spider_dto.SBook,error) {
 	}
 	return &res, err
 }
-
+/*
 func InsertChapter(chapter *spider_dto.SChapter) error{
 
 	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
@@ -101,7 +114,7 @@ func InsertChapter(chapter *spider_dto.SChapter) error{
 
 func UpdateChapter(chapter *spider_dto.SChapter) error {
 	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
-		m := bson.M{"title":chapter.Title}
+		m := bson.M{"_id":chapter.Id}
 		err := c.Update(m, chapter)
 		if err != nil {
 			utils.Logger.Println("UpdateChapter error" + err.Error())
@@ -114,7 +127,7 @@ func UpdateChapter(chapter *spider_dto.SChapter) error {
 
 func DeleteChapter(chapter *spider_dto.SChapter) error {
 	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
-		m := bson.M{"title":chapter.Title}
+		m := bson.M{"_id":chapter.Id}
 		err := c.Remove(m)
 		if err != nil {
 			utils.Logger.Println("DeleteChapter error" + err.Error())
@@ -137,18 +150,16 @@ func ListChapterByTitle(chapter *spider_dto.SChapter) (*spider_dto.SChapter, err
 	})
 	return &res, err
 }
-
-func ListAllChapter(req *spider_dto.SListCommon) (*[]spider_dto.SChapter,error) {
-	var res []spider_dto.SChapter
-	err := utils.WithMongoDBCollection(DBNAME, req.CollectionName, func(c *mgo.Collection) error{
-		err := c.Find(bson.M{}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
-		if err != nil{
-			utils.Logger.Println("ListAllChapter error" + err.Error())
+func ListChapterById(chapter *spider_dto.SChapter) (*spider_dto.SChapter, error) {
+	var res spider_dto.SChapter
+	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
+		m := bson.M{"_id":chapter.Id}
+		err := c.Find(m).One(&res)
+		if err != nil {
+			utils.Logger.Println("ListChapterByTitle error" + err.Error())
 		}
 		return err
 	})
-	if err != nil {
-		return nil, err
-	}
 	return &res, err
 }
+*/

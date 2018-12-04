@@ -16,7 +16,7 @@ func SetupRouter(router *gin.Engine) *gin.Engine{
 	{
 		viewGroup.GET("/",service.ListAllBook)
 		viewGroup.GET("/:bookid",service.ListBook)
-		//viewGroup.GET("/:bookid/:chapterid",service.ListChapter)
+		viewGroup.GET("/:bookid/:chapterid",service.ListChapter)
 	}
 	return router
 }

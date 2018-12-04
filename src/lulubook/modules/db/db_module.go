@@ -97,6 +97,18 @@ func ListAllBook(req *spider_dto.SListCommon) (*[]spider_dto.SBook,error) {
 	}
 	return &res, err
 }
+func ListChapterById(req *spider_dto.SListCommon) (*spider_dto.SBook, error) {
+	var res spider_dto.SBook
+	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
+		m := bson.M{"_id":req.Id, "chapter._id":req.ChapterId}
+		err := c.Find(m).Select(bson.M{"chapter.$": 1}).One(&res)
+		if err != nil {
+			utils.Logger.Println("ListBookByName error" + err.Error())
+		}
+		return err
+	})
+	return &res, err
+}
 /*
 func InsertChapter(chapter *spider_dto.SChapter) error{
 
@@ -150,16 +162,5 @@ func ListChapterByTitle(chapter *spider_dto.SChapter) (*spider_dto.SChapter, err
 	})
 	return &res, err
 }
-func ListChapterById(chapter *spider_dto.SChapter) (*spider_dto.SChapter, error) {
-	var res spider_dto.SChapter
-	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
-		m := bson.M{"_id":chapter.Id}
-		err := c.Find(m).One(&res)
-		if err != nil {
-			utils.Logger.Println("ListChapterByTitle error" + err.Error())
-		}
-		return err
-	})
-	return &res, err
-}
+
 */

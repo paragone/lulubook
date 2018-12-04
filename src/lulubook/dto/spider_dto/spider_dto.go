@@ -27,6 +27,7 @@ type SChapter struct{
 
 type SListCommon struct{
 	Id 	  string
+	ChapterId 	  string
 	Offset    int            `form:"offset,default=0" json:"offset,default=0"`
 	Limited   int            `form:"limited,default=20" json:"limited,default=20"`
 	Order     string         `form:"order,default=asc" json:"order,default=asc"`

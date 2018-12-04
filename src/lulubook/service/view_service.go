@@ -43,11 +43,11 @@ func ListBook(c *gin.Context) {
 	c.JSON(http.StatusOK, &res)
 	return
 }
-/*
+
 func ListChapter(c *gin.Context){
 	var req spider_dto.SListCommon
 	req.Id = c.Param("bookid")
-	req.Chapterid = c.Param("chapterid")
+	req.ChapterId = c.Param("chapterid")
 	err := c.ShouldBind(&req)
 	if err != nil {
 		utils.Logger.Println("req error " + err.Error())
@@ -55,15 +55,7 @@ func ListChapter(c *gin.Context){
 		return
 	}
 
-	book, err := db.ListBookById(&req)
-	if err != nil {
-		utils.Logger.Println("req error " + err.Error())
-		utils.SendFailedResponse(c, utils.ErrorCodeInvalidResponse, utils.ErrorDescInvalidResponse)
-		return
-	}
-
-	res, err := db.ListChapterById()
+	res, err := db.ListChapterById(&req)
 	c.JSON(http.StatusOK, &res)
 	return
 }
-*/

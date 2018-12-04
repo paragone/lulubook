@@ -104,7 +104,7 @@ func getAllBookUrl(spider *BookTextSpider, url string) error{
 				_,ok := spider.crawledUrl[href]
 				if !ok {
 					spider.crawledUrl[href] = true
-					spider.SpiderSite("http://www.booktxt.com" + href)
+					getAllBookUrl(spider,"http://www.booktxt.com" + href)
 				}
 			}
 			if isBookHref(href){
@@ -127,16 +127,16 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 	// Request the HTML page.
 	res, err := http.Get(url)
 	if err != nil {
-		utils.Logger.Fatal(err)
+		utils.Logger.Println(err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		utils.Logger.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		utils.Logger.Println("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		utils.Logger.Fatal(err)
+		utils.Logger.Println(err)
 	}
 	bookname := utils.GbkToUtf8(doc.Find("#info h1").Text())
 	querybook.Name = bookname
@@ -152,9 +152,14 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 		chapter := spider_dto.SChapter{Id:strconv.Itoa(chapterid), BookId:id,Title:title,Url:url, Pre:pre, Next:next}
 		querybook.Chapters = append(querybook.Chapters, chapter)
 	})
-
+	//for range创建副本
+	/*
 	for _,chap := range querybook.Chapters{
 		SpiderChapter( &chap)
+	}
+	*/
+	for i:= 0; i< len(querybook.Chapters); i++{
+		SpiderChapter(&querybook.Chapters[i])
 	}
 	/*
     if book,err := db.ListBookByName(&querybook){
@@ -173,16 +178,16 @@ func SpiderChapter(chapter *spider_dto.SChapter){
 		// Request the HTML page.
 		res, err := http.Get("http://www.booktxt.com"+chapter.Url)
 		if err != nil {
-			utils.Logger.Fatal(err)
+			utils.Logger.Println(err)
 		}
 		defer res.Body.Close()
 		if res.StatusCode != 200 {
-			utils.Logger.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+			utils.Logger.Println("status code error: %d %s", res.StatusCode, res.Status)
 		}
 
 		doc, err := goquery.NewDocumentFromReader(res.Body)
 		if err != nil {
-			utils.Logger.Fatal(err)
+			utils.Logger.Println(err)
 		}
 		content := doc.Find("#content").Text()
 		content = utils.GbkToUtf8(content)

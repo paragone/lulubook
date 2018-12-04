@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"lulubook/modules/db"
 	"lulubook/router"
 )
 
 func main() {
 	//for test
-	//db.DropDB()
+	db.DropDB()
 	r := gin.Default()
 
 	r = router.SetupRouter(r)

@@ -2,18 +2,17 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"lulubook/modules/db"
-	"lulubook/router"
+		"lulubook/router"
 )
 
 func main() {
 	//for test
-	db.DropDB()
+
 	r := gin.Default()
 
 	r = router.SetupRouter(r)
 
-    r.Run(":80")
+    r.Run(":8090")
 
 	/*
     sp ,err:= service.NewSpider("booktxt")

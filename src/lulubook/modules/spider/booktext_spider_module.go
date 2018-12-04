@@ -157,7 +157,7 @@ func SpiderBook(id string,url string) error{
 	channel := make(chan struct{}, 100)
 	for i:= 0; i< len(querybook.Chapters); i++{
 		channel <- struct{}{}
-		SpiderChapter(&querybook.Chapters[i], channel)
+		go SpiderChapter(&querybook.Chapters[i], channel)
 	}
 	for i := 0; i < 100; i++{
 		channel <- struct{}{}

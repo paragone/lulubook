@@ -11,7 +11,9 @@ type SBook struct{
 	Name  string      	`json:"name" bson:"name"`
 	Image string 		`json:"image" bson:"image"`
 	Url   string 	    `json:"url" bson:"url"`
-	Chapters []SChapter `json:"chapter" bson:"chapter"`
+	ChapterNum int      `json:"chapternum" bson:"chapternum"`
+	CreatedAt time.Time `json:"createdat" bson:"createdat"`
+	UpdatedAt time.Time `json:"updatedat" bson:"updatedat"`
 }
 
 type SChapter struct{
@@ -22,6 +24,7 @@ type SChapter struct{
 	Pre     int 		`json:"pre" bson:"pre"`
 	Next    int 		`json:"next" bson:"next"`
 	Content string 		`json:"content" bson:"content"`
+	CreatedAt time.Time `json:"createdat" bson:"createdat"`
 	UpdatedAt time.Time `json:"updatedat" bson:"updatedat"`
 }
 

@@ -57,62 +57,49 @@ func DeleteBook(book *spider_dto.SBook) error {
 	return err
 }
 
-func ListBookByName(book *spider_dto.SBook) (*spider_dto.SBook, error) {
+func ListBookByName(book *spider_dto.SBook) (spider_dto.SBook, error) {
 	var res spider_dto.SBook
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
 		m := bson.M{"name":book.Name}
 		err := c.Find(m).One(&res)
-		if err != nil {
-			utils.Logger.Println("ListBookByName error" + err.Error())
-		}
 		return err
 	})
-	return &res, err
+	return res, err
 }
 
-func ListBookById(req *spider_dto.SListCommon) (*spider_dto.SBook, error) {
-	var res spider_dto.SBook
-	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		m := bson.M{"_id":req.Id}
-		err := c.Find(m).One(&res)
-		if err != nil {
-			utils.Logger.Println("ListBookByName error" + err.Error())
-		}
+func ListBookById(req *spider_dto.SListCommon) ([]spider_dto.SChapter, error) {
+	var res []spider_dto.SChapter
+	err := utils.WithMongoDBCollection(DBNAME, req.Id, func(c *mgo.Collection) error{
+		err := c.Find(bson.M{}).Select(bson.M{"content":0}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
 		return err
 	})
-	return &res, err
+	return res, err
 }
 
-func ListAllBook(req *spider_dto.SListCommon) (*[]spider_dto.SBook,error) {
+func ListAllBook(req *spider_dto.SListCommon) ([]spider_dto.SBook,error) {
 	var res []spider_dto.SBook
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		err := c.Find(bson.M{}).Select(bson.M{"chapter": 0}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
-		if err != nil{
-			utils.Logger.Println("ListBook error" + err.Error())
-		}
+		err := c.Find(bson.M{}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
-	return &res, err
+	return res, err
 }
-func ListChapterById(req *spider_dto.SListCommon) (*spider_dto.SBook, error) {
-	var res spider_dto.SBook
-	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		m := bson.M{"_id":req.Id, "chapter._id":req.ChapterId}
-		err := c.Find(m).Select(bson.M{"chapter.$": 1}).One(&res)
-		if err != nil {
-			utils.Logger.Println("ListBookByName error" + err.Error())
-		}
+func ListChapterById(req *spider_dto.SListCommon) (spider_dto.SChapter, error) {
+	var res spider_dto.SChapter
+	err := utils.WithMongoDBCollection(DBNAME, req.Id, func(c *mgo.Collection) error{
+		m := bson.M{"_id":req.ChapterId}
+		err := c.Find(m).One(&res)
 		return err
 	})
-	return &res, err
+	return res, err
 }
-/*
+
 func InsertChapter(chapter *spider_dto.SChapter) error{
 
-	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
+	err := utils.WithMongoDBCollection(DBNAME, chapter.BookId, func(c *mgo.Collection) error{
 		err := c.Insert(chapter)
 
 		if err != nil {
@@ -125,7 +112,7 @@ func InsertChapter(chapter *spider_dto.SChapter) error{
 }
 
 func UpdateChapter(chapter *spider_dto.SChapter) error {
-	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
+	err := utils.WithMongoDBCollection(DBNAME, chapter.BookId, func(c *mgo.Collection) error{
 		m := bson.M{"_id":chapter.Id}
 		err := c.Update(m, chapter)
 		if err != nil {
@@ -138,7 +125,7 @@ func UpdateChapter(chapter *spider_dto.SChapter) error {
 }
 
 func DeleteChapter(chapter *spider_dto.SChapter) error {
-	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
+	err := utils.WithMongoDBCollection(DBNAME, chapter.BookId, func(c *mgo.Collection) error{
 		m := bson.M{"_id":chapter.Id}
 		err := c.Remove(m)
 		if err != nil {
@@ -150,17 +137,14 @@ func DeleteChapter(chapter *spider_dto.SChapter) error {
 	return err
 }
 
-func ListChapterByTitle(chapter *spider_dto.SChapter) (*spider_dto.SChapter, error) {
+func ListChapterByTitle(chapter *spider_dto.SChapter) (spider_dto.SChapter, error) {
 	var res spider_dto.SChapter
-	err := utils.WithMongoDBCollection(DBNAME, chapter.BookName, func(c *mgo.Collection) error{
+	err := utils.WithMongoDBCollection(DBNAME, chapter.BookId, func(c *mgo.Collection) error{
 		m := bson.M{"title":chapter.Title}
 		err := c.Find(m).One(&res)
-		if err != nil {
-			utils.Logger.Println("ListChapterByTitle error" + err.Error())
-		}
 		return err
 	})
-	return &res, err
+	return res, err
 }
 
-*/
+

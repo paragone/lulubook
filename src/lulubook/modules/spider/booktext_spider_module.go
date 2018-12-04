@@ -116,7 +116,7 @@ func getAllBookUrl(spider *BookTextSpider, url string) error{
 	return nil
 }
 
-func SpiderBook(id string,url string) error{
+func SpiderBook(id string,url string){
 	utils.Logger.Println("SpiderBook url:" + url)
 	querybook := spider_dto.SBook{}
 	querybook.Id = id
@@ -137,7 +137,11 @@ func SpiderBook(id string,url string) error{
 	bookname := utils.GbkToUtf8(doc.Find("#info h1").Text())
 	querybook.Name = bookname
 	querybook.Url = url
+	querybook.CreatedAt = time.Now()
+	querybook.UpdatedAt = time.Now()
 
+
+	var chapters []spider_dto.SChapter
 	doc.Find("#list dd").Each(func (i int, contentSelection *goquery.Selection){
 		pre := i - 1
 		next := i + 1
@@ -146,30 +150,46 @@ func SpiderBook(id string,url string) error{
 		href, _ := contentSelection.Find("a").Attr("href")
 		url := "http://www.booktxt.com"+href
 		chapter := spider_dto.SChapter{Id:strconv.Itoa(chapterid), BookId:id,Title:title,Url:url, Pre:pre, Next:next}
-		querybook.Chapters = append(querybook.Chapters, chapter)
+		chapters = append(chapters, chapter)
 	})
+	querybook.ChapterNum = len(chapters)
+	book,err := db.ListBookByName(&querybook)
+	var newChapter int
+	if err == nil && book.Name != ""{
+		newChapter = querybook.ChapterNum - book.ChapterNum
+		book.Url = url
+		book.ChapterNum = querybook.ChapterNum
+		book.UpdatedAt = querybook.UpdatedAt
+	} else {
+		newChapter = querybook.ChapterNum
+	}
 	//for range创建副本
 	/*
 	for _,chap := range querybook.Chapters{
 		SpiderChapter( &chap)
 	}
 	*/
-	channel := make(chan struct{}, 100)
-	for i:= 0; i< len(querybook.Chapters); i++{
-		channel <- struct{}{}
-		go SpiderChapter(&querybook.Chapters[i], channel)
-	}
-	for i := 0; i < 100; i++{
-		channel <- struct{}{}
-	}
-	close(channel)
-	/*
-    if book,err := db.ListBookByName(&querybook){
 
+    if newChapter > 0 {
+		channel := make(chan struct{}, 100)
+		offset := len(chapters) - newChapter
+		for i:= offset; i< len(chapters); i++{
+			channel <- struct{}{}
+			go SpiderChapter(&chapters[i], channel)
+		}
+		for i := 0; i < 100; i++{
+			channel <- struct{}{}
+		}
+		close(channel)
 	}
-	*/
-	db.InsertBook(&querybook)
-	return nil
+    if book.Name != ""{
+		db.UpdateBook(&book)
+	} else {
+		db.InsertBook(&querybook)
+	}
+
+
+	return
 }
 
 type ChanTag struct{}
@@ -196,7 +216,17 @@ func SpiderChapter(chapter *spider_dto.SChapter, c chan struct{}){
 		content = utils.GbkToUtf8(content)
 		content = strings.Replace(content, "聽", " ", -1)
 		chapter.Content = content
+		chapter.CreatedAt = time.Now()
 		chapter.UpdatedAt = time.Now()
+		chap,err := db.ListChapterByTitle(chapter)
+		if err == nil && chap.Title != ""{
+			chap.Url = chapter.Url
+			chap.UpdatedAt = chapter.UpdatedAt
+			db.UpdateChapter(&chap)
+			utils.Logger.Println("update chapter")
+		} else {
+			db.InsertChapter(chapter)
+		}
 	}
 }
 

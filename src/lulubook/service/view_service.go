@@ -17,7 +17,7 @@ func ListAllBook(c *gin.Context) {
 	}
 	res, err := db.ListAllBook(&req)
 	if err != nil {
-		utils.Logger.Println("req error " + err.Error())
+		utils.Logger.Println("res error " + err.Error())
 		utils.SendFailedResponse(c, utils.ErrorCodeInvalidResponse, utils.ErrorDescInvalidResponse)
 		return
 	}
@@ -36,7 +36,7 @@ func ListBook(c *gin.Context) {
 	}
 	res, err := db.ListBookById(&req)
 	if err != nil {
-		utils.Logger.Println("req error " + err.Error())
+		utils.Logger.Println("res error " + err.Error())
 		utils.SendFailedResponse(c, utils.ErrorCodeInvalidResponse, utils.ErrorDescInvalidResponse)
 		return
 	}
@@ -56,6 +56,11 @@ func ListChapter(c *gin.Context){
 	}
 
 	res, err := db.ListChapterById(&req)
+	if err != nil {
+		utils.Logger.Println("res error " + err.Error())
+		utils.SendFailedResponse(c, utils.ErrorCodeInvalidResponse, utils.ErrorDescInvalidResponse)
+		return
+	}
 	c.JSON(http.StatusOK, &res)
 	return
 }

@@ -140,7 +140,7 @@ func SpiderBook(id string,url string, c chan struct{}) error{
 	}
 	bookname := utils.GbkToUtf8(doc.Find("#info h1").Text())
 	querybook.Name = bookname
-
+	querybook.Url = url
 
 	doc.Find("#list dd").Each(func (i int, contentSelection *goquery.Selection){
 		pre := i - 1

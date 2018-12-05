@@ -160,25 +160,16 @@
         var nextBtn = function(UIcallback) {
             switch (mode) {
                 case 0: {
-                    if (offset > (BookTotal - 20)) {
-                        return;
-                    }
                     offset += 20;
                     getBookList(UIcallback);
                     break;
                 }
                 case 1: {
-                    if (offset > (ChapterTotal - 20)) {
-                        return;
-                    }
                     offset += 20;
                     getCurChapterContent(Book_id, UIcallback);
                     break;
                 }
                 case 2: {
-                    if (Chapter_id === ChapterTotal) {
-                        return;
-                    }
                     Chapter_id += 1;
                     getCurChapterContent(Chapter_id, UIcallback);
                     break;

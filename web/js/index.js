@@ -212,6 +212,10 @@
         return function(data) {
             container.html(parseBookList(data));
             $('#action_mid').hide();
+            Dom.top_nav.hide();
+            Dom.bottom_nav.hide();
+            Dom.font_container.hide();
+            $('.icon-ft').removeClass('current');
         }
     }
     function RenderChapterList(container) {
@@ -228,6 +232,10 @@
         return function(data) {
             container.html(parseChapterList(data));
             $('#action_mid').hide();
+            Dom.top_nav.hide();
+            Dom.bottom_nav.hide();
+            Dom.font_container.hide();
+            $('.icon-ft').removeClass('current');
         }
     }
     function RenderChapterContent(container) {
@@ -242,6 +250,10 @@
         return function(data) {
             container.html(parseChapterContent(data));
             $('#action_mid').show();
+            Dom.top_nav.hide();
+            Dom.bottom_nav.hide();
+            Dom.font_container.hide();
+            $('.icon-ft').removeClass('current');
         }
     }
 

@@ -70,7 +70,8 @@ func ListBookByName(book *spider_dto.SBook) (spider_dto.SBook, error) {
 func ListBookById(req *spider_dto.SListCommon) ([]spider_dto.SChapter, error) {
 	var res []spider_dto.SChapter
 	err := utils.WithMongoDBCollection(DBNAME, req.Id, func(c *mgo.Collection) error{
-		err := c.Find(bson.M{}).Select(bson.M{"content":0}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
+		collation := &mgo.Collation{Locale: "zh",NumericOrdering:true}
+		err := c.Find(bson.M{}).Collation(collation).Select(bson.M{"content":0}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
 		return err
 	})
 	return res, err
@@ -79,7 +80,8 @@ func ListBookById(req *spider_dto.SListCommon) ([]spider_dto.SChapter, error) {
 func ListAllBook(req *spider_dto.SListCommon) ([]spider_dto.SBook,error) {
 	var res []spider_dto.SBook
 	err := utils.WithMongoDBCollection(DBNAME, BOOKCOLLECTION, func(c *mgo.Collection) error{
-		err := c.Find(bson.M{}).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
+		collation := &mgo.Collation{Locale: "zh",NumericOrdering:true}
+		err := c.Find(bson.M{}).Collation(collation).Sort("_id").Skip(req.Offset).Limit(req.Limited).All(&res)
 		return err
 	})
 	if err != nil {

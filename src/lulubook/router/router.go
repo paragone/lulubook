@@ -6,6 +6,7 @@ import (
 )
 
 func SetupRouter(router *gin.Engine) *gin.Engine{
+	router.Static("/web", "web")
 	v1 := router.Group("/api/v1")
 	dbGroup := v1.Group("db")
 	{

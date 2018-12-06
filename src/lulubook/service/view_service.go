@@ -34,7 +34,7 @@ func ListBook(c *gin.Context) {
 		utils.SendFailedResponse(c, utils.ErrorCodeInvalidRequest, utils.ErrorDescInvalidRequest)
 		return
 	}
-	res, err := db.ListBookById(&req)
+	res, err := db.ListBookChaptersById(&req)
 	if err != nil {
 		utils.Logger.Println("res error " + err.Error())
 		utils.SendFailedResponse(c, utils.ErrorCodeInvalidResponse, utils.ErrorDescInvalidResponse)
@@ -64,3 +64,4 @@ func ListChapter(c *gin.Context){
 	c.JSON(http.StatusOK, &res)
 	return
 }
+

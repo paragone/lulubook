@@ -1,25 +1,12 @@
 package service
 
 import (
-	"errors"
-	"lulubook/modules/spider"
 	"github.com/gin-gonic/gin"
 	"lulubook/dto/spider_dto"
+	"lulubook/modules/spider"
 	"lulubook/utils"
 )
 
-type Spider interface{
-	SpiderSite(url string) error
-}
-
-func NewSpider(from string) (Spider, error){
-	switch from{
-	case "booktxt":
-		return new(spider.BookTextSpider), nil
-	default:
-		return nil, errors.New("暂不支持该种爬虫")
-	}
-}
 
 func SpiderRun(c *gin.Context){
 	var req spider_dto.SpiderRequest
@@ -30,13 +17,13 @@ func SpiderRun(c *gin.Context){
 		return
 	}
 	if req.Action == "start" {
-		spider,err := NewSpider(req.Name)
+		spider,err := spider.CreateSpider(req.Name)
 		if err != nil {
 			utils.Logger.Println("start error" + err.Error())
 			utils.SendFailedResponse(c, utils.ErrorCodeFailed, utils.ErrorDescFaild + err.Error())
 			return
 		}
-		go spider.SpiderSite(req.Url)
+		go spider.CrawlSite(req.Url)
 	}
 	utils.SendSuccessResponse(c)
 	return

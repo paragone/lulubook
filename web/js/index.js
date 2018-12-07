@@ -44,9 +44,17 @@
         readBookList = RenderBookList(RootContainer);
         readChapterList = RenderChapterList(RootContainer);
         readChapterContent= RenderChapterContent(RootContainer);
-        readModel.init(function(data) {
-            readBookList(data);
-        });
+        if(StorageGetter("book") == null || StorageGetter("chapter") == null) {
+            readModel.init(function(data) {
+                readBookList(data);
+            });
+        } else {
+            var bookid = parseInt(StorageGetter("book"));
+            var chapterid = parseInt(StorageGetter("book"));
+            readModel.listChapter(bookid, readChapterList);
+            readModel.curChapter(chapterid, readChapterContent);
+        }
+
 
         EventHanlder();
     }
@@ -90,7 +98,8 @@
                 Book_id = book_id;
                 mode = 1;
                 callback && callback(data);
-            })
+            });
+            Util.StorageSetter('book', Book_id);
         };
 
         //获取章节内容
@@ -104,7 +113,7 @@
                 mode = 2;
                 callback && callback(data);
             });
-            Util.StorageSetter('last_chapter_id', Chapter_id);
+            Util.StorageSetter('chapter', Chapter_id);
         };
 
         var listBook = function(UIcallback) {
@@ -248,40 +257,6 @@
         }
     }
 
-    $.fn.scrollTo = function (options) {
-        console.log("scrollTo")
-        var defaults = {
-            toT: 0,    //滚动目标位置
-            durTime: 500,  //过渡动画时间
-            delay: 30,     //定时器时间
-            callback: null   //回调函数
-        };
-        var opts = $.extend(defaults, options),
-            timer = null,
-            _this = this,
-            curTop = _this.scrollTop(),//滚动条当前的位置
-            subTop = opts.toT - curTop,    //滚动条目标位置和当前位置的差值
-            index = 0,
-            dur = Math.round(opts.durTime / opts.delay),
-            smoothScroll = function (t) {
-                index++;
-                var per = Math.round(subTop / dur);
-                if (index >= dur) {
-                    _this.scrollTop(t);
-                    window.clearInterval(timer);
-                    if (opts.callback && typeof opts.callback == 'function') {
-                        opts.callback();
-                    }
-                    return;
-                } else {
-                    _this.scrollTop(curTop + index * per);
-                }
-            };
-        timer = window.setInterval(function () {
-            smoothScroll(opts.toT);
-        }, opts.delay);
-        return _this;
-    };
 
     function EventHanlder() {
         //控制层的作用
@@ -391,7 +366,8 @@
                         return;
                 }
             });
-            document.documentElement.scrollTop = 0;
+            var scrollTop = window.pageYOffset||document.documentElement.scrollTop|| document.body.scrollTop|| 0;
+            scrollTop();
         });
         $('#next_button').click(function() {
             readModel.nextBtn(function(data) {
@@ -412,7 +388,8 @@
                         return;
                 }
             });
-            document.documentElement.scrollTop = 0;
+            var scrollTop = window.pageYOffset||document.documentElement.scrollTop|| document.body.scrollTop|| 0;
+            scrollTop();
         });
     }
     main();

@@ -163,9 +163,9 @@ func (parser *BookTxtParser)ParseChapter(chapter *spider_dto.SChapter){
 		utils.Logger.Println(err)
 		return
 	}
-	content := doc.Find("#content").Text()
+	content ,_:= doc.Find("#content").Html()
 	content = utils.GbkToUtf8(content)
-	content = strings.Replace(content, "聽", " ", -1)
+	content = strings.Replace(content, "聽", "&nbsp;", -1)
 	chapter.Content = content
 	chapter.CreatedAt = time.Now()
 	chapter.UpdatedAt = time.Now()

@@ -31,7 +31,17 @@ func SpiderRun(c *gin.Context){
 }
 
 func SpiderVerify(c *gin.Context){
-	res := spider.VerifyBook()
-	c.JSON(http.StatusOK, &res)
+	spider,err := spider.CreateSpider("booktxt")
+	if err != nil {
+		utils.Logger.Println("createSpider error" + err.Error())
+		utils.SendFailedResponse(c, utils.ErrorCodeFailed, utils.ErrorDescFaild + err.Error())
+		return
+	}
+	error := spider.VerifyBook()
+	if error != nil {
+		utils.Logger.Println("verify error" + err.Error())
+		utils.SendFailedResponse(c, utils.ErrorCodeFailed, utils.ErrorDescFaild + err.Error())
+	}
+	c.JSON(http.StatusOK, &spider.NoResponseBooks)
 	return
 }

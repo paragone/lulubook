@@ -21,6 +21,7 @@ type Spider struct{
 	//bookUrl    []string
 	books       []spider_dto.SBook
 	parser     Parser
+	NoResponseBooks       []spider_dto.SBook
 }
 
 func CreateSpider(from string) (*Spider, error){
@@ -134,36 +135,41 @@ func (spider *Spider)CrawlChapter(chapter *spider_dto.SChapter, c chan struct{})
 	db.InsertChapter(chapter)
 }
 
-func VerifyBook() []spider_dto.SBook{
-	books := make([]spider_dto.SBook, 0)
+func (spider *Spider)VerifyBook() error{
 	var req spider_dto.SListCommon
 	req.Offset = 0
 	req.Limited = 0
 	booklist, err := db.ListAllBook(&req)
 	if err != nil {
 		utils.Logger.Println("this is  no  book in db")
-		return nil
+		return err
 	}
+	utils.Logger.Println("VerifyBook num :" ,len(booklist))
+	channel := make(chan struct{}, 100)
 	for _, book := range booklist {
-		if !verifyUrl(book.Url){
-			books = append(books, book)
-		}
+		channel <- struct{}{}
+		go spider.verifyUrl(book, channel)
 	}
-	return books
+	for i := 0; i < 100; i++{
+		channel <- struct{}{}
+	}
+	return nil
 }
 
-func verifyUrl(url string) bool{
-	utils.Logger.Println("verifyUrl :" + url)
+func (spider *Spider)verifyUrl(book spider_dto.SBook, c chan struct{}) {
+	defer func(){<- c}()
+	utils.Logger.Println("verify book url :" + book.Url)
 	// Request the HTML page.
-	res, err := http.Get(url)
+	res, err := http.Get(book.Url)
 	if err != nil {
 		utils.Logger.Println(err)
-		return false
+		spider.NoResponseBooks = append(spider.NoResponseBooks, book)
+		return
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		utils.Logger.Println("status code error: %d %s", res.StatusCode, res.Status)
-		return false
+		spider.NoResponseBooks = append(spider.NoResponseBooks, book)
+		return
 	}
-	return true
+	return
 }

@@ -1,16 +1,18 @@
 echo "set GOPATH"
 export GOPATH=`pwd`
 
+if [ "$1" == "china" ];then
+	echo "for china,  get golang.org/x/net"
+
+	git clone https://github.com/golang/net.git
+
+	mkdir -p src/golang.org/x/
+
+	mv net src/golang.org/x/
+fi
+
 echo "go get gin"
 go get  github.com/gin-gonic/gin
-
-echo "for china,  get golang.org/x/net"
-
-git clone https://github.com/golang/net.git
-
-mkdir -p golang.org/x/
-
-mv net golang.org/x/
 
 echo "go get goquery"
 

@@ -6,6 +6,7 @@ import (
 	"lulubook/modules/db"
 	"lulubook/modules/parser"
 	"lulubook/utils"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -133,4 +134,36 @@ func (spider *Spider)CrawlChapter(chapter *spider_dto.SChapter, c chan struct{})
 	db.InsertChapter(chapter)
 }
 
+func VerifyBook() []spider_dto.SBook{
+	books := make([]spider_dto.SBook, 0)
+	var req spider_dto.SListCommon
+	req.Offset = 0
+	req.Limited = 0
+	booklist, err := db.ListAllBook(&req)
+	if err != nil {
+		utils.Logger.Println("this is  no  book in db")
+		return nil
+	}
+	for _, book := range booklist {
+		if !verifyUrl(book.Url){
+			books = append(books, book)
+		}
+	}
+	return books
+}
 
+func verifyUrl(url string) bool{
+	utils.Logger.Println("verifyUrl :" + url)
+	// Request the HTML page.
+	res, err := http.Get(url)
+	if err != nil {
+		utils.Logger.Println(err)
+		return false
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		utils.Logger.Println("status code error: %d %s", res.StatusCode, res.Status)
+		return false
+	}
+	return true
+}

@@ -16,6 +16,7 @@ func SetupRouter(router *gin.Engine) *gin.Engine{
 	spiderGroup := v1.Group("/spider")
 	{
 		spiderGroup.POST("/", service.SpiderRun)
+		spiderGroup.GET("/verify", service.SpiderVerify)
 	}
 	viewGroup := v1.Group("/view")
 	{

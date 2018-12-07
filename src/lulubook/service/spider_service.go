@@ -5,6 +5,7 @@ import (
 	"lulubook/dto/spider_dto"
 	"lulubook/modules/spider"
 	"lulubook/utils"
+	"net/http"
 )
 
 
@@ -26,5 +27,11 @@ func SpiderRun(c *gin.Context){
 		go spider.CrawlSite(req.Url)
 	}
 	utils.SendSuccessResponse(c)
+	return
+}
+
+func SpiderVerify(c *gin.Context){
+	res := spider.VerifyBook()
+	c.JSON(http.StatusOK, &res)
 	return
 }

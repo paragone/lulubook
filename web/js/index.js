@@ -44,7 +44,8 @@
         readBookList = RenderBookList(RootContainer);
         readChapterList = RenderChapterList(RootContainer);
         readChapterContent= RenderChapterContent(RootContainer);
-        if(Util.StorageGetter("book") == "undefined" || Util.StorageGetter("chapter") == "undefined") {
+        if(Util.StorageGetter("book") == "undefined" || Util.StorageGetter("chapter") == "undefined"
+        ||Util.StorageGetter("book") == null || Util.StorageGetter("chapter") == null) {
             readModel.init(function(data) {
                 readBookList(data);
             });
@@ -127,7 +128,7 @@
             });
         };
         var listChapter = function(book_id,UIcallback) {
-            
+
             getChapterOfBook(book_id,function(data) {
                 UIcallback && UIcallback(data);
             });

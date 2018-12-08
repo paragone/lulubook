@@ -44,15 +44,16 @@
         readBookList = RenderBookList(RootContainer);
         readChapterList = RenderChapterList(RootContainer);
         readChapterContent= RenderChapterContent(RootContainer);
-        if(StorageGetter("book") == null || StorageGetter("chapter") == null) {
+        if(Util.StorageGetter("book") == "undefined" || Util.StorageGetter("chapter") == "undefined") {
             readModel.init(function(data) {
                 readBookList(data);
             });
         } else {
-            var bookid = parseInt(StorageGetter("book"));
-            var chapterid = parseInt(StorageGetter("book"));
-            readModel.listChapter(bookid, readChapterList);
+            //var bookid = parseInt(Util.StorageGetter("book"));
+            var chapterid = parseInt(Util.StorageGetter("chapter"));
+            //readModel.listChapter(bookid, readChapterList);
             readModel.curChapter(chapterid, readChapterContent);
+
         }
 
 
@@ -63,8 +64,6 @@
         //实现和阅读器先关的数据交互的方法
         var Chapter_id;
         var Book_id;
-        var ChapterTotal;
-        var BookTotal;
 
         var limited = 20;
         var offset = 0;
@@ -82,7 +81,6 @@
                 offset = 0;
             }
             $.getJSON('/api/v1/view/?offset='+offset+'&limited='+limited, function(data) {
-                BookTotal = data.length;
                 mode = 0;
                 callback && callback(data);
             })
@@ -94,12 +92,13 @@
                 offset = 0;
             }
             $.getJSON('/api/v1/view/'+book_id+'/?offset='+offset+'&limited='+limited, function(data) {
-                ChapterTotal = data.length;
                 Book_id = book_id;
                 mode = 1;
+
+                Util.StorageSetter('book', Book_id);
                 callback && callback(data);
             });
-            Util.StorageSetter('book', Book_id);
+
         };
 
         //获取章节内容
@@ -108,12 +107,18 @@
                 limited = 20;
                 offset = 0;
             }
+
+            if(Book_id == undefined)
+                Book_id = Util.StorageGetter('book');
+
             $.getJSON('/api/v1/view/'+Book_id+'/'+chapter_id+'/', function(data) {
                 Chapter_id = chapter_id;
                 mode = 2;
+
+                Util.StorageSetter('chapter', Chapter_id);
                 callback && callback(data);
             });
-            Util.StorageSetter('chapter', Chapter_id);
+
         };
 
         var listBook = function(UIcallback) {
@@ -122,12 +127,13 @@
             });
         };
         var listChapter = function(book_id,UIcallback) {
-            console.log("in")
+            
             getChapterOfBook(book_id,function(data) {
                 UIcallback && UIcallback(data);
             });
         };
         var curChapter = function(chapter_id, UIcallback) {
+
             getCurChapterContent(chapter_id,function(data) {
                 UIcallback && UIcallback(data);
             });
@@ -257,6 +263,14 @@
         }
     }
 
+    function pageScroll(){
+
+        //获取scrollTop值
+        var sTop=window.pageYOffset||document.documentElement.scrollTop|| document.body.scrollTop|| 0;
+        //把内容滚动指定的像素数（第一个参数向右滚动的像素数，第二个参数向下滚动的像素数）
+        window.scrollBy(0,-sTop);
+
+    }
 
     function EventHanlder() {
         //控制层的作用
@@ -366,8 +380,7 @@
                         return;
                 }
             });
-            var scrollTop = window.pageYOffset||document.documentElement.scrollTop|| document.body.scrollTop|| 0;
-            scrollTop();
+            pageScroll();
         });
         $('#next_button').click(function() {
             readModel.nextBtn(function(data) {
@@ -388,8 +401,7 @@
                         return;
                 }
             });
-            var scrollTop = window.pageYOffset||document.documentElement.scrollTop|| document.body.scrollTop|| 0;
-            scrollTop();
+            pageScroll();
         });
     }
     main();
